@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avigdor Felder — Capstone Dashboards</title>
+<meta name="description" content="Four university analytics dashboards built on IPEDS data: PhD completions, institutional resources, peer tuition, and a full-breadth prototype.">
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --border: #dfe3ea;
+    --text: #0a2540;
+    --muted: #5b6b82;
+    --accent: #0033a0;
+    --accent-text: #ffffff;
+    --accent-soft: #eaf0fa;
+    --gold: #9a7b2f;
+    --shadow: 0 1px 2px rgba(10,37,64,.06), 0 8px 24px rgba(10,37,64,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c1220;
+      --surface: #131c2e;
+      --border: #24314a;
+      --text: #e6ecf5;
+      --muted: #9aabc4;
+      --accent: #7ba4ff;
+      --accent-text: #0c1220;
+      --accent-soft: #1a2740;
+      --gold: #d9b566;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1220;
+    --surface: #131c2e;
+    --border: #24314a;
+    --text: #e6ecf5;
+    --muted: #9aabc4;
+    --accent: #7ba4ff;
+    --accent-text: #0c1220;
+    --accent-soft: #1a2740;
+    --gold: #d9b566;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 4rem 1.25rem 5rem; }
+
+  header { margin-bottom: 3rem; }
+  .home-link {
+    display: inline-block; font-size: .82rem; font-weight: 600; text-decoration: none;
+    color: var(--muted); margin-bottom: 1.1rem;
+  }
+  .home-link:hover { color: var(--accent); }
+  .eyebrow {
+    font-size: .78rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--gold); font-weight: 700; margin: 0 0 .75rem;
+  }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); line-height: 1.15; margin: 0 0 .9rem; letter-spacing: -.02em; }
+  .lede { font-size: 1.08rem; color: var(--muted); max-width: 62ch; margin: 0; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .grid { display: grid; gap: 1.25rem; }
+  @media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column;
+  }
+  .card-top {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: .75rem; margin-bottom: .6rem;
+  }
+  .num {
+    font-size: .74rem; font-weight: 700; letter-spacing: .1em;
+    color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .badge {
+    font-size: .7rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    padding: .25rem .55rem; border-radius: 999px; white-space: nowrap;
+  }
+  .badge.live { background: var(--accent-soft); color: var(--accent); }
+  .badge.local { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+
+  .card h2 { font-size: 1.16rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
+  .q {
+    font-size: .95rem; color: var(--text); margin: 0 0 .9rem;
+    padding-left: .8rem; border-left: 3px solid var(--accent); font-style: italic;
+  }
+  .desc { font-size: .92rem; color: var(--muted); margin: 0 0 1.1rem; flex: 1; }
+
+  .meta { font-size: .8rem; color: var(--muted); margin: 0 0 1.1rem; }
+  .meta span { display: inline-block; }
+  .meta .sep { margin: 0 .45rem; opacity: .5; }
+
+  .links { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .btn {
+    font-size: .85rem; font-weight: 600; text-decoration: none;
+    padding: .45rem .85rem; border-radius: 8px; border: 1px solid var(--border);
+    color: var(--text); background: transparent; transition: background .15s, border-color .15s;
+  }
+  .btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .btn.primary:hover { opacity: .88; background: var(--accent); border-color: var(--accent); }
+
+  .note {
+    margin-top: 2.5rem; padding: 1.1rem 1.25rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--gold); border-radius: 10px;
+    font-size: .88rem; color: var(--muted);
+  }
+  .note strong { color: var(--text); }
+
+  footer {
+    margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+    font-size: .84rem; color: var(--muted);
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a href="/" class="home-link">← Avigdor Felder</a>
+    <p class="eyebrow">Data Analytics &amp; Visualization Capstone</p>
+    <h1>University analytics dashboards</h1>
+    <p class="lede">
+      Four dashboards built for a university Provost's office. Three run on <strong>real IPEDS
+      data</strong> from the U.S. Department of Education — each answering exactly one question,
+      with a hard no-synthetic-data rule. The fourth is the full-breadth prototype that made the
+      case for narrowing.
+    </p>
+  </header>
+
+  <div class="grid">
+
+    <article class="card">
+      <div class="card-top">
+        <span class="num">01</span>
+        <span class="badge local">Runs locally</span>
+      </div>
+      <h2>Institutional Data Dashboard</h2>
+      <p class="q">What does a full-breadth university analytics dashboard look like, end to end?</p>
+      <p class="desc">
+        Six tabs over one shared filter state — enrollment, academics, courses, admissions,
+        finance, and drill-down. Built on <strong>synthetic data</strong> to exercise layout,
+        filtering, and branding before scope narrowed. The control case for everything after it.
+      </p>
+      <p class="meta">
+        <span>Streamlit · Python · pandas</span><span class="sep">·</span><span>Synthetic data</span>
+      </p>
+      <div class="links">
+        <a class="btn" href="https://github.com/anfelder613/university-dashboard">Repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-top">
+        <span class="num">02</span>
+        <span class="badge live">Live</span>
+      </div>
+      <h2>PhD Completions Dashboard</h2>
+      <p class="q">How many CS and Math doctorates does YU produce, compared to five peers?</p>
+      <p class="desc">
+        Doctoral completions 2015–2024 across six institutions. Its analytical core: two
+        institutions sit at zero in Computer Science for <strong>structurally different
+        reasons</strong> — one a new program, one with no doctoral records at all — and the
+        dashboard is built so those two zeros can never be read as the same story.
+      </p>
+      <p class="meta">
+        <span>React · Vite · Recharts</span><span class="sep">·</span><span>IPEDS Completions</span>
+      </p>
+      <div class="links">
+        <a class="btn primary" href="https://anfelder613.github.io/yu-enrollment-dashboard/">View dashboard</a>
+        <a class="btn" href="https://github.com/anfelder613/yu-enrollment-dashboard">Repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-top">
+        <span class="num">03</span>
+        <span class="badge live">Live</span>
+      </div>
+      <h2>Institutional Resources Dashboard</h2>
+      <p class="q">How resource-intensive is YU compared to peers, and how has that changed?</p>
+      <p class="desc">
+        Instruction spending per student, FY2015–2024, against five private peers. All six are
+        FASB filers — the condition IPEDS itself requires for a valid comparison. The measure is
+        <strong>published by IPEDS, not computed here</strong>. PostgreSQL is the authoritative
+        store; the shipped JSON is a generated artifact.
+      </p>
+      <p class="meta">
+        <span>React · Vite · Recharts · PostgreSQL</span><span class="sep">·</span><span>IPEDS Finance</span>
+      </p>
+      <div class="links">
+        <a class="btn primary" href="https://anfelder613.github.io/yu-institutional-resources-dashboard/">View dashboard</a>
+        <a class="btn" href="https://github.com/anfelder613/yu-institutional-resources-dashboard">Repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-top">
+        <span class="num">04</span>
+        <span class="badge local">Runs locally</span>
+      </div>
+      <h2>Peer Tuition Dashboard</h2>
+      <p class="q">How does YU's published tuition compare to peers, by level, over a decade?</p>
+      <p class="desc">
+        Published tuition AY2015–16 through AY2024–25. Undergraduate and graduate figures are
+        <strong>never blended</strong> — no such number exists in IPEDS, and inventing one would
+        be synthetic data by another name. Required fees are an opt-in toggle, so they never
+        silently inflate the headline.
+      </p>
+      <p class="meta">
+        <span>Streamlit · Plotly · PostgreSQL</span><span class="sep">·</span><span>IPEDS Cost</span>
+      </p>
+      <div class="links">
+        <a class="btn" href="https://github.com/anfelder613/yu-tuition-dashboard">Repository</a>
+      </div>
+    </article>
+
+  </div>
+
+  <p class="note">
+    <strong>Why two run locally.</strong> GitHub Pages serves static files only. Projects 02 and
+    03 are static React builds, so they deploy directly. Projects 01 and 04 are Streamlit apps
+    that need a live Python process — and 04 additionally queries a PostgreSQL database — so both
+    require a Python host rather than Pages. Each repository's README covers how to run it.
+  </p>
+
+  <footer>
+    Built by Avigdor Felder · Yeshiva University ·
+    <a href="https://github.com/anfelder613">github.com/anfelder613</a><br>
+    Data source: <a href="https://nces.ed.gov/ipeds/">IPEDS</a>, National Center for Education
+    Statistics. Project 01 uses synthetic data and describes no real institution.
+  </footer>
+
+</div>
+</body>
+</html>
