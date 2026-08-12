@@ -12,6 +12,7 @@ Visualization capstone — a single page linking four university analytics dashb
 |---|---|
 | `/` (`index.html`) | Personal landing page — who I am, and a link into the capstone work |
 | `/capstone/` (`capstone/index.html`) | Index of the four capstone dashboards (unchanged content, moved from root) |
+| `/capstone/Capstone-Presentation-Felder.pptx` | The capstone presentation deck, linked from the top of the capstone index |
 
 ## The capstone projects
 
